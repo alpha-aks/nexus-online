@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Analytics from "@/components/Analytics";
 import Home from "@/pages/Home";
 import Services from "@/pages/Services";
 import ServiceDetail from "@/pages/ServiceDetail";
@@ -11,6 +12,7 @@ import Navbar from "@/components/Navbar";
 function App() {
   return (
     <>
+      <Analytics />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
