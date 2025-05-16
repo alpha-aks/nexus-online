@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, Linkedin } from "lucide-react";
+import { Mail, Phone, Linkedin } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 

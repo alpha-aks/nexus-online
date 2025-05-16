@@ -1,5 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom';
-import { Filter, Clock, Briefcase, Users } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { useEffect } from 'react';
 
 type Category = 'all' | 'tech' | 'design' | 'marketing' | 'consulting';
