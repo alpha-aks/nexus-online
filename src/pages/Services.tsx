@@ -1,6 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { Filter } from 'lucide-react';
-import { useEffect } from 'react';
 
 type Category = 'all' | 'tech' | 'design' | 'marketing' | 'consulting';
 
@@ -225,10 +224,6 @@ export default function Services() {
   const filteredServices = servicesData.services.filter(service => {
     return category === 'all' || service.category === category;
   });
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="min-h-screen bg-black pt-16">
