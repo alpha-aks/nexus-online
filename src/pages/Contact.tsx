@@ -7,7 +7,7 @@ const representatives = [
   {
     name: "Atharva Salunkhe",
     role: "CEO",
-    image: "/representatives/atharva.jpg",
+    image: "https://images.prismic.io/alphas/aCcRXidWJ-7kSNfD_Untitleddesign-6.jpg?auto=format,compress",
     contact: {
       email: "contact@nexusmarketing.com",
       phone: "+91 82914 38590",
@@ -17,7 +17,7 @@ const representatives = [
   {
     name: "Omkar Leve",
     role: "Founder",
-    image: "/representatives/omkar.jpg",
+    image: "https://images.prismic.io/alphas/aCcRUidWJ-7kSNe9_1st.png?auto=format,compress",
     contact: {
       email: "omkar@nexusmarketing.com",
       phone: "+91 70839 03909",
