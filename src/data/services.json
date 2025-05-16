@@ -1,0 +1,103 @@
+{
+  "services": [
+    {
+      "id": "web-development",
+      "title": "Web Development",
+      "category": "tech",
+      "description": "Professional web development services using cutting-edge technologies like React, Next.js, and Node.js. We build responsive, scalable, and performant web applications tailored to your needs.",
+      "image": "/services/web-dev.jpg",
+      "timeline": "4-8 weeks",
+      "expertise": "Full Stack",
+      "teamSize": "2-4 developers",
+      "features": [
+        "Custom web application development",
+        "Responsive design implementation",
+        "API development and integration",
+        "Database design and optimization",
+        "Performance optimization",
+        "SEO-friendly architecture"
+      ],
+      "enrollLink": "/contact?service=web-development",
+      "gallery": [
+        {
+          "url": "/portfolio/web-1.jpg",
+          "caption": "E-commerce Platform"
+        },
+        {
+          "url": "/portfolio/web-2.jpg",
+          "caption": "Social Media Dashboard"
+        },
+        {
+          "url": "/portfolio/web-3.jpg",
+          "caption": "Real Estate Portal"
+        }
+      ]
+    },
+    {
+      "id": "ui-design",
+      "title": "UI/UX Design",
+      "category": "design",
+      "description": "Create beautiful, intuitive user interfaces and experiences that delight your users. Our design process focuses on user research, wireframing, and iterative prototyping.",
+      "image": "/services/ui-design.jpg",
+      "timeline": "2-4 weeks",
+      "expertise": "UI/UX Design",
+      "teamSize": "1-2 designers",
+      "features": [
+        "User research and personas",
+        "Wireframing and prototyping",
+        "Visual design and branding",
+        "Interaction design",
+        "Usability testing",
+        "Design system creation"
+      ],
+      "enrollLink": "/contact?service=ui-design",
+      "gallery": [
+        {
+          "url": "/portfolio/design-1.jpg",
+          "caption": "Mobile App Design"
+        },
+        {
+          "url": "/portfolio/design-2.jpg",
+          "caption": "Website Redesign"
+        },
+        {
+          "url": "/portfolio/design-3.jpg",
+          "caption": "Brand Guidelines"
+        }
+      ]
+    },
+    {
+      "id": "digital-marketing",
+      "title": "Digital Marketing",
+      "category": "marketing",
+      "description": "Boost your online presence with our comprehensive digital marketing services. We help you reach your target audience and achieve measurable results.",
+      "image": "/services/marketing.jpg",
+      "timeline": "Ongoing",
+      "expertise": "Digital Marketing",
+      "teamSize": "2-3 specialists",
+      "features": [
+        "SEO optimization",
+        "Social media marketing",
+        "Content strategy",
+        "Email marketing",
+        "PPC campaigns",
+        "Analytics and reporting"
+      ],
+      "enrollLink": "/contact?service=digital-marketing",
+      "gallery": [
+        {
+          "url": "/portfolio/marketing-1.jpg",
+          "caption": "Social Media Campaign"
+        },
+        {
+          "url": "/portfolio/marketing-2.jpg",
+          "caption": "Email Newsletter"
+        },
+        {
+          "url": "/portfolio/marketing-3.jpg",
+          "caption": "SEO Results"
+        }
+      ]
+    }
+  ]
+}
