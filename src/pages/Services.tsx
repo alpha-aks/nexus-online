@@ -199,7 +199,7 @@ const servicesData = {
       id: "seo",
       title: "SEO Optimization",
       category: "marketing",
-      image: "/services/seo.jpg",
+      image: "https://plus.unsplash.com/premium_photo-1685283298465-e52e933a3312?q=80&w=2500&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       description: "Optimize your website for search engines to improve visibility and drive organic traffic. We implement proven SEO strategies for better rankings.",
       timeline: "Ongoing",
       expertise: "SEO",
