@@ -1,34 +1,20 @@
 import { useEffect } from 'react';
+import ReactGA from 'react-ga4';
 
-interface Window {
-  vercelAnalytics?: {
-    init: () => void;
-  };
-}
-
-declare const window: Window;
+const TRACKING_ID = 'G-ZKNCM6D1LM'; // Your Google Analytics tracking ID
 
 export default function Analytics() {
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://vitals.vercel-insights.com/v1/insights';
-    script.async = true;
-    script.onload = () => {
-      console.log('Analytics script loaded');
-      if (window.vercelAnalytics) {
-        console.log('Initializing analytics');
-        window.vercelAnalytics.init();
-      } else {
-        console.error('vercelAnalytics not available');
-      }
-    };
-    script.onerror = () => {
-      console.error('Failed to load analytics script');
-    };
-    document.body.appendChild(script);
+    ReactGA.initialize(TRACKING_ID);
+    ReactGA.gtag('config', TRACKING_ID);
+    
+    // Track page view
+    ReactGA.gtag('event', 'page_view', {
+      page_path: window.location.pathname + window.location.search
+    });
 
     return () => {
-      document.body.removeChild(script);
+      // Cleanup if needed
     };
   }, []);
 
