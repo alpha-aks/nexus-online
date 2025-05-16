@@ -3,11 +3,31 @@ import { Link } from "react-router-dom";
 
 // Client logos data
 const clients = [
-  { id: 1, name: "Client A", logo: "/client-a-logo.png" },
-  { id: 2, name: "Client B", logo: "/client-b-logo.png" },
-  { id: 3, name: "Client C", logo: "/client-c-logo.png" },
-  { id: 4, name: "Client D", logo: "/client-d-logo.png" },
-  { id: 5, name: "Client E", logo: "/client-e-logo.png" },
+  { 
+    id: 1, 
+    name: "Alpha",
+    logo: "https://images.prismic.io/alphas/aCcQCidWJ-7kSNch_logo-2.png?auto=format,compress"
+  },
+  { 
+    id: 2, 
+    name: "Client B",
+    logo: "https://images.prismic.io/alphas/aCcP_CdWJ-7kSNcZ_images-5.jpeg?auto=format,compress"
+  },
+  { 
+    id: 3, 
+    name: "Client C",
+    logo: "https://images.prismic.io/alphas/aCcP7CdWJ-7kSNcU_images-4.png?auto=format,compress"
+  },
+  { 
+    id: 4, 
+    name: "Client D",
+    logo: "https://images.prismic.io/alphas/aCcQXSdWJ-7kSNdA_images-5.png?auto=format,compress"
+  },
+  { 
+    id: 5, 
+    name: "Client E",
+    logo: "/client-e-logo.png"
+  },
 ];
 
 export function Sponsors() {
