@@ -6,20 +6,10 @@ import {
   useCallback,
   useMemo,
   useRef,
-  lazy,
 } from "react";
-import {
-  EffectComposer,
-  ChromaticAberration,
-} from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
 import * as THREE from "three";
+import { Stars } from "@react-three/drei";
 import LoadingScreen from "../LoadingScreen";
-
-// Lazy load heavy components
-const Stars = lazy(() => import("./Stars"));
-const Spaceship = lazy(() => import("./Spaceship"));
-const MotionBlur = lazy(() => import("./MotionBlur"));
 
 // Types
 interface DynamicEnvMapProps {
@@ -67,16 +57,14 @@ const DynamicEnvMap: React.FC<DynamicEnvMapProps> = ({ children }) => {
         if (obj.name === "spaceship") {
           obj.visible = true;
           // Apply environment map to spaceship materials
-          obj.traverse((child) => {
-            if (
-              child instanceof THREE.Mesh &&
-              child.material instanceof THREE.MeshStandardMaterial
-            ) {
-              child.material.envMap = envMap.texture;
-              child.material.envMapIntensity = 100;
-              child.material.needsUpdate = true;
+          if (obj instanceof THREE.Mesh) {
+            const mesh = obj as THREE.Mesh;
+            if (mesh.material instanceof THREE.MeshStandardMaterial) {
+              mesh.material.envMap = envMap.texture;
+              mesh.material.envMapIntensity = 100;
+              mesh.material.needsUpdate = true;
             }
-          });
+          }
         }
       });
 
@@ -258,7 +246,7 @@ const SpaceshipController: React.FC<SpaceshipControllerProps> = ({
     }
   }, [turbo, onBoostComplete]);
 
-  return <Spaceship turbo={turbo} ref={spaceshipRef} />;
+  return <mesh ref={spaceshipRef} />;
 };
 
 // Main Experience component
@@ -298,11 +286,7 @@ const Experience = () => {
   }, [handleKeyDown, handleKeyUp, isMobile]);
 
   const handleBoostComplete = useCallback(() => {
-    // Trigger page transition when boost is complete
     if (isBoosting) {
-      // Add your page transition logic here
-      // For example, navigate to the next page
-      // window.location.href = '/next-page'
       console.log('Boost complete!');
     }
   }, [isBoosting]);
@@ -340,56 +324,74 @@ const Experience = () => {
         dpr={[1, 1.5]}
         performance={{ min: 0.5 }}
         shadows
-        camera={{ fov: 40, near: 0.1, far: 200 }}
+        camera={{ position: [-4, 4, 6], fov: 40 }}
         gl={{
           antialias: true,
           powerPreference: "high-performance",
+          preserveDrawingBuffer: true
         }}
         style={{
           background: "#000000",
+          backgroundColor: '#000000',
         }}
       >
-        <CameraRig turbo={turbo} />
-
         <Suspense fallback={null}>
           <DynamicEnvMap>
             {/* Mouse tracking plane */}
             <MousePlane onMove={setMousePoint} turbo={turbo} />
 
             {/* Enhanced Lighting Setup */}
-            <ambientLight intensity={0.3} />
+            <ambientLight intensity={0.5} />
 
             {/* Main directional light */}
             <directionalLight
               position={[1, 2, 3]}
-              intensity={0.5}
+              intensity={1.0}
+              color={0xffffff}
               castShadow
-              shadow-mapSize={[1024, 1024]}
+              shadow-mapSize={[2048, 2048]}
               shadow-bias={-0.0001}
             />
 
+            {/* Additional lights */}
+            <pointLight
+              position={[0, 10, 0]}
+              intensity={1.5}
+              color={0xffffff}
+            />
+            <hemisphereLight
+              intensity={0.5}
+              color="#000000"
+              groundColor="#000000"
+            />
+
             {/* Stars Background */}
-            <Stars turbo={turbo} />
+            <Stars count={2000} radius={100} factor={4} saturation={0} fade speed={2} />
 
             {/* Spaceship with movement control */}
-            <SpaceshipController mousePoint={mousePoint} turbo={turbo} onBoostComplete={handleBoostComplete} />
+            <SpaceshipController
+              mousePoint={mousePoint}
+              turbo={turbo}
+              onBoostComplete={handleBoostComplete}
+            />
 
             {/* Post Processing */}
             <EffectComposer multisampling={4}>
-              {/* Motion Blur */}
-              <MotionBlur turbo={turbo} />
-
-              {/* Chromatic Aberration */}
               <ChromaticAberration
-                blendFunction={BlendFunction.NORMAL}
+                blendFunction="normal"
                 offset={[0.002 * turbo, 0.002 * turbo]}
               />
             </EffectComposer>
+
+            {/* Camera Rig */}
+            <CameraRig turbo={turbo} />
           </DynamicEnvMap>
         </Suspense>
       </Canvas>
     </div>
   );
 };
+
+import { EffectComposer, ChromaticAberration } from "@react-three/postprocessing";
 
 export default Experience;

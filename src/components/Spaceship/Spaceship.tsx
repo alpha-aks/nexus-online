@@ -15,12 +15,50 @@ const Spaceship = forwardRef<THREE.Group, SpaceshipProps>((props, ref) => {
   const clock = useRef(0)
 
   useEffect(() => {
-    if (groupRef.current) {
+    if (!groupRef.current) return;
+
+    try {
       // Scale down the model
       groupRef.current.scale.set(0.5, 0.5, 0.5)
       
       // Position the spaceship
       groupRef.current.position.set(0, 0, 0)
+      
+      // Add debug logging
+      console.log('Spaceship model initialized successfully');
+    } catch (error) {
+      console.error('Error initializing spaceship model:', error);
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!groupRef.current) return;
+
+    try {
+      // Load the model
+      const { scene } = useGLTF('/public/spaceship.glb');
+      
+      // Add the model to the scene
+      scene.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          // Set initial position
+          child.position.set(0, 0, 0);
+          
+          // Handle materials
+          if (child.material instanceof THREE.MeshStandardMaterial) {
+            child.material.metalness = 0.5;
+            child.material.roughness = 0.5;
+            child.material.emissiveIntensity = 0.5;
+          }
+        }
+      });
+      
+      groupRef.current.add(scene);
+      
+      // Add debug logging
+      console.log('Spaceship model loaded successfully');
+    } catch (error) {
+      console.error('Error loading spaceship model:', error);
     }
   }, [])
 
