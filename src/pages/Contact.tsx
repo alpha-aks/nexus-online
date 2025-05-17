@@ -9,7 +9,7 @@ const representatives = [
     role: "CEO",
     image: "https://images.prismic.io/alphas/aCcRXidWJ-7kSNfD_Untitleddesign-6.jpg?auto=format,compress",
     contact: {
-      email: "contact@nexusmarketing.com",
+      email: "atharvasalunkhe@nexusmarketing.co.in",
       phone: "+91 82914 38590",
       linkedin: "https://linkedin.com/in/atharva-salunkhe"
     }
@@ -19,7 +19,7 @@ const representatives = [
     role: "Founder",
     image: "https://images.prismic.io/alphas/aCcRUidWJ-7kSNe9_1st.png?auto=format,compress",
     contact: {
-      email: "omkar@nexusmarketing.com",
+      email: "omkarleve@nexusmarketing.co.in",
       phone: "+91 70839 03909",
       linkedin: "https://linkedin.com/in/omkar-leve"
     }
@@ -27,9 +27,9 @@ const representatives = [
   {
     name: "Vishal Das",
     role: "Marketing Director",
-    image: "/representatives/vishal.jpg",
+    image: "https://images.prismic.io/alphas/aCiHCCdWJ-7kSQJB_WhatsAppImage2025-05-16at15.55.51.jpeg?auto=format,compress",
     contact: {
-      email: "vishal@nexusmarketing.com",
+      email: "vishaldas@nexusmarketing.co.in",
       phone: "+91 73041 45033",
       linkedin: "https://linkedin.com/in/vishal-das"
     }
@@ -53,7 +53,6 @@ export default function Contact() {
     setError(null);
 
     try {
-      // Send to Telegram bot
       const BOT_TOKEN = "7965214317:AAEJy9iYl674tcO8fupMzFPXn8FmRUGBG5c";
       const CHAT_ID = "-4975658405";
       
@@ -100,151 +99,147 @@ export default function Contact() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-bold text-white mb-4"
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
           >
-            Contact Us
+            Get In Touch
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-white/50 max-w-2xl mx-auto"
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg text-gray-300 max-w-2xl mx-auto"
           >
-            Get in touch with our team or send us a message
+            Ready to take your business to the next level? Let's connect and explore how we can help you achieve your goals.
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Representatives */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="space-y-8"
-          >
-            {representatives.map((rep) => (
-              <div 
-                key={rep.name}
-                className="bg-neutral-900 rounded-2xl p-6 border border-white/10 flex gap-6 items-center"
-              >
-                {/* Avatar */}
-                <div className="w-20 h-20 rounded-full bg-neutral-800 overflow-hidden flex-shrink-0">
-                  <img 
-                    src={rep.image} 
-                    alt={rep.name}
-                    className="w-full h-full object-cover"
+        {/* Contact Form */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {/* Form */}
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-300">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-black text-white focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
 
-                {/* Info */}
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-white">{rep.name}</h3>
-                  <p className="text-white/50 text-sm mb-3">{rep.role}</p>
-                  
-                  <div className="flex gap-4">
-                    <a 
-                      href={`mailto:${rep.contact.email}`}
-                      className="text-white/70 hover:text-white transition-colors"
-                    >
-                      <Mail className="w-4 h-4" />
-                    </a>
-                    <a 
-                      href={`tel:${rep.contact.phone}`}
-                      className="text-white/70 hover:text-white transition-colors"
-                    >
-                      <Phone className="w-4 h-4" />
-                    </a>
-                    <a 
-                      href={rep.contact.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white/70 hover:text-white transition-colors"
-                    >
-                      <Linkedin className="w-4 h-4" />
-                    </a>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                    Your Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-black text-white focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-300">
+                    Your Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={4}
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-black text-white focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+
+                {error && (
+                  <div className="text-red-500 text-sm">{error}</div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </button>
+
+                {submissionSuccess && (
+                  <div className="text-green-500 text-sm mt-4">
+                    Message sent successfully! We'll get back to you soon.
+                  </div>
+                )}
+              </form>
+            </motion.div>
+          </div>
+
+          {/* Representatives */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
+          >
+            {representatives.map((rep, index) => (
+              <div key={index} className="bg-black/50 rounded-lg p-6">
+                <div className="flex items-center space-x-6">
+                  <img
+                    src={rep.image}
+                    alt={rep.name}
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">
+                      {rep.name}
+                    </h3>
+                    <p className="text-gray-400">{rep.role}</p>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center text-gray-400">
+                        <Mail className="w-4 h-4 mr-2" />
+                        <a
+                          href={`mailto:${rep.contact.email}`}
+                          className="hover:text-blue-500 transition-colors"
+                        >
+                          {rep.contact.email}
+                        </a>
+                      </div>
+                      <div className="flex items-center text-gray-400">
+                        <Phone className="w-4 h-4 mr-2" />
+                        <span>{rep.contact.phone}</span>
+                      </div>
+                      <div className="flex items-center text-gray-400">
+                        <Linkedin className="w-4 h-4 mr-2" />
+                        <a
+                          href={rep.contact.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-blue-500 transition-colors"
+                        >
+                          LinkedIn
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
-          </motion.div>
-
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="space-y-6"
-          >
-            <div className="bg-neutral-900 rounded-2xl p-8 border border-white/10">
-              {error && (
-                <div className="text-red-400 text-center mb-4">
-                  {error}
-                </div>
-              )}
-              
-              {submissionSuccess ? (
-                <div className="text-center">
-                  <p className="text-white">Thank you for your message!</p>
-                  <p className="text-white/50 mt-2">We'll get back to you as soon as possible.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label htmlFor="name" className="block text-white/70 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full bg-neutral-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-white/30"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-white/70 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full bg-neutral-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-white/30"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-white/70 mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      rows={4}
-                      className="w-full bg-neutral-800 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-white/30 resize-none"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                  </button>
-                </form>
-              )}
-            </div>
           </motion.div>
         </div>
       </div>

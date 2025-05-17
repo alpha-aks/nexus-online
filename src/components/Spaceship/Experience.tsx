@@ -21,50 +21,73 @@ const Stars = lazy(() => import("./Stars"));
 const Spaceship = lazy(() => import("./Spaceship"));
 const MotionBlur = lazy(() => import("./MotionBlur"));
 
+// Types
+interface DynamicEnvMapProps {
+  children: React.ReactNode;
+}
+
+interface CameraRigProps {
+  turbo: number;
+}
+
+interface MousePlaneProps {
+  onMove: (point: THREE.Vector3) => void;
+  turbo: number;
+}
+
+interface SpaceshipControllerProps {
+  mousePoint: THREE.Vector3;
+  turbo: number;
+  onBoostComplete?: () => void;
+}
+
 // Create PMREM Generator for dynamic environment mapping
-const DynamicEnvMap = ({ children }: { children: React.ReactNode }) => {
+const DynamicEnvMap: React.FC<DynamicEnvMapProps> = ({ children }) => {
   const { gl, scene } = useThree();
   const pmrem = useMemo(() => new THREE.PMREMGenerator(gl), [gl]);
   const previousEnvMap = useRef<THREE.WebGLRenderTarget | null>(null);
 
   useFrame(() => {
-    // Hide spaceship temporarily
-    scene.traverse((obj) => {
-      if (obj.name === "spaceship") obj.visible = false;
-    });
+    try {
+      // Hide spaceship temporarily
+      scene.traverse((obj) => {
+        if (obj.name === "spaceship") obj.visible = false;
+      });
 
-    // Clear background
-    const originalBackground = scene.background;
-    scene.background = null;
+      // Clear background
+      const originalBackground = scene.background;
+      scene.background = null;
 
-    // Generate environment map
-    const envMap = pmrem.fromScene(scene);
+      // Generate environment map
+      const envMap = pmrem.fromScene(scene);
 
-    // Restore scene
-    scene.background = originalBackground;
-    scene.traverse((obj) => {
-      if (obj.name === "spaceship") {
-        obj.visible = true;
-        // Apply environment map to spaceship materials
-        obj.traverse((child) => {
-          if (
-            child instanceof THREE.Mesh &&
-            child.material instanceof THREE.MeshStandardMaterial
-          ) {
-            child.material.envMap = envMap.texture;
-            child.material.envMapIntensity = 100;
-            child.material.normalScale?.set(0.3, 0.3);
-            child.material.needsUpdate = true;
-          }
-        });
+      // Restore scene
+      scene.background = originalBackground;
+      scene.traverse((obj) => {
+        if (obj.name === "spaceship") {
+          obj.visible = true;
+          // Apply environment map to spaceship materials
+          obj.traverse((child) => {
+            if (
+              child instanceof THREE.Mesh &&
+              child.material instanceof THREE.MeshStandardMaterial
+            ) {
+              child.material.envMap = envMap.texture;
+              child.material.envMapIntensity = 100;
+              child.material.needsUpdate = true;
+            }
+          });
+        }
+      });
+
+      // Dispose of previous envMap
+      if (previousEnvMap.current) {
+        previousEnvMap.current.dispose();
       }
-    });
-
-    // Dispose of previous envMap
-    if (previousEnvMap.current) {
-      previousEnvMap.current.dispose();
+      previousEnvMap.current = envMap;
+    } catch (error) {
+      console.error('Error generating environment map:', error);
     }
-    previousEnvMap.current = envMap;
   });
 
   // Cleanup on unmount
@@ -75,17 +98,18 @@ const DynamicEnvMap = ({ children }: { children: React.ReactNode }) => {
       }
       pmrem.dispose();
     };
-  }, [pmrem]);
+  }, [pmrem, previousEnvMap]);
 
   return <>{children}</>;
 };
 
-const CameraRig = ({ turbo }: { turbo: number }) => {
+// Camera Rig
+const CameraRig: React.FC<CameraRigProps> = ({ turbo }) => {
   const { camera } = useThree();
   const perspCamera = camera as THREE.PerspectiveCamera;
 
   // Base camera position for non-turbo view
-  const basePosition = new THREE.Vector3(-4, 4, 6); //RGB x-axis:red y-axis:green z-axis:blue
+  const basePosition = new THREE.Vector3(-4, 4, 6);
   const baseLookAt = new THREE.Vector3(0, 0, 0);
 
   // Turbo camera position
@@ -93,41 +117,42 @@ const CameraRig = ({ turbo }: { turbo: number }) => {
   const turboLookAt = new THREE.Vector3(-5, 0, 0);
 
   useFrame(() => {
-    const targetPos = turbo ? turboPosition : basePosition;
-    const targetLook = turbo ? turboLookAt : baseLookAt;
+    try {
+      const targetPos = turbo > 0 ? turboPosition : basePosition;
+      const targetLook = turbo > 0 ? turboLookAt : baseLookAt;
 
-    // Smoothly interpolate position
-    camera.position.lerp(targetPos, 0.05);
+      // Smoothly interpolate position
+      camera.position.lerp(targetPos, 0.05);
 
-    // Update camera look-at
-    camera.lookAt(targetLook);
+      // Update camera look-at
+      camera.lookAt(targetLook);
 
-    // Update FOV
-    const targetFOV = 40 + turbo * 15;
-    perspCamera.fov = THREE.MathUtils.lerp(perspCamera.fov, targetFOV, 0.02);
-    perspCamera.updateProjectionMatrix();
+      // Update FOV
+      const targetFOV = 40 + turbo * 15;
+      perspCamera.fov = THREE.MathUtils.lerp(perspCamera.fov, targetFOV, 0.02);
+      perspCamera.updateProjectionMatrix();
+    } catch (error) {
+      console.error('Error updating camera:', error);
+    }
   });
 
   // Set initial position and look-at
   useEffect(() => {
-    camera.position.copy(basePosition);
-    camera.lookAt(baseLookAt);
-    perspCamera.fov = 40;
-    perspCamera.updateProjectionMatrix();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    try {
+      camera.position.copy(basePosition);
+      camera.lookAt(baseLookAt);
+      perspCamera.fov = 40;
+      perspCamera.updateProjectionMatrix();
+    } catch (error) {
+      console.error('Error setting initial camera:', error);
+    }
   }, [camera]);
 
   return null;
 };
 
-// Mouse tracking for spaceship control
-const MousePlane = ({
-  onMove,
-  turbo,
-}: {
-  onMove: (point: THREE.Vector3) => void;
-  turbo: number;
-}) => {
+// MousePlane component for mouse tracking
+const MousePlane: React.FC<MousePlaneProps> = ({ onMove, turbo }) => {
   const intersectionPoint = new THREE.Vector3();
 
   const handlePointerMove = (event: { point: THREE.Vector3 }) => {
@@ -149,13 +174,11 @@ const MousePlane = ({
   );
 };
 
-// Spaceship movement controller
-const SpaceshipController = ({
+// SpaceshipController component
+const SpaceshipController: React.FC<SpaceshipControllerProps> = ({
   mousePoint,
   turbo,
-}: {
-  mousePoint: THREE.Vector3;
-  turbo: number;
+  onBoostComplete,
 }) => {
   const spaceshipRef = useRef<THREE.Group>(null);
   const translateY = useRef(0);
@@ -168,69 +191,82 @@ const SpaceshipController = ({
   useFrame(() => {
     if (!spaceshipRef.current) return;
 
-    if (turbo > 0) {
-      // During turbo, gradually return to center
-      translateAcceleration.current += (0 - translateY.current) * 0.01;
-      angleAcceleration.current += (0 - angleZ.current) * 0.01;
-      pitchAcceleration.current += (0 - pitchAngle.current) * 0.01;
-    } else {
-      // Normal steering with bounds
-      const boundedY = Math.max(-3, Math.min(1, mousePoint.y)); // Limit vertical range to ±3 units
-      translateAcceleration.current += (boundedY - translateY.current) * 0.002;
+    try {
+      if (turbo > 0) {
+        // During turbo, gradually return to center
+        translateAcceleration.current += (0 - translateY.current) * 0.01;
+        angleAcceleration.current += (0 - angleZ.current) * 0.01;
+        pitchAcceleration.current += (0 - pitchAngle.current) * 0.01;
+      } else {
+        // Normal steering with bounds
+        const boundedY = Math.max(-3, Math.min(1, mousePoint.y)); // Limit vertical range to ±3 units
+        translateAcceleration.current += (boundedY - translateY.current) * 0.002;
 
-      // Calculate target pitch based on mouse Z position
-      const targetPitch = mousePoint.z * 0.5;
-      pitchAcceleration.current += (targetPitch - pitchAngle.current) * 0.01;
+        // Calculate target pitch based on mouse Z position
+        const targetPitch = mousePoint.z * 0.5;
+        pitchAcceleration.current += (targetPitch - pitchAngle.current) * 0.01;
+      }
+
+      // Apply acceleration damping
+      translateAcceleration.current *= 0.95;
+      translateY.current += translateAcceleration.current;
+
+      pitchAcceleration.current *= 0.85;
+      pitchAngle.current += pitchAcceleration.current;
+
+      // Calculate rotation based on mouse position with bounds
+      const dir = mousePoint
+        .clone()
+        .sub(new THREE.Vector3(0, translateY.current, 0))
+        .normalize();
+
+      // Calculate yaw (left/right tilt)
+      const dirCos = dir.dot(new THREE.Vector3(0, 1, 0));
+      const angle = Math.acos(dirCos) - Math.PI / 2;
+
+      // Limit rotation angles
+      const boundedAngle = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, angle));
+      const boundedPitch = Math.max(
+        -Math.PI / 6,
+        Math.min(Math.PI / 6, pitchAngle.current)
+      );
+
+      // Update rotation with smooth acceleration
+      if (!turbo) {
+        angleAcceleration.current += (boundedAngle - angleZ.current) * 0.01;
+      }
+      angleAcceleration.current *= 0.75;
+      angleZ.current += angleAcceleration.current;
+
+      // Apply transformations with proper Euler angles
+      spaceshipRef.current.position.setY(translateY.current);
+      spaceshipRef.current.rotation.set(
+        boundedPitch,
+        -Math.PI / 2,
+        angleZ.current,
+        "YZX"
+      );
+    } catch (error) {
+      console.error('Error controlling spaceship:', error);
     }
-
-    // Apply acceleration damping
-    translateAcceleration.current *= 0.95;
-    translateY.current += translateAcceleration.current;
-
-    pitchAcceleration.current *= 0.85;
-    pitchAngle.current += pitchAcceleration.current;
-
-    // Calculate rotation based on mouse position with bounds
-    const dir = mousePoint
-      .clone()
-      .sub(new THREE.Vector3(0, translateY.current, 0))
-      .normalize();
-
-    // Calculate yaw (left/right tilt)
-    const dirCos = dir.dot(new THREE.Vector3(0, 1, 0));
-    const angle = Math.acos(dirCos) - Math.PI / 2;
-
-    // Limit rotation angles
-    const boundedAngle = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, angle));
-    const boundedPitch = Math.max(
-      -Math.PI / 6,
-      Math.min(Math.PI / 6, pitchAngle.current)
-    );
-
-    // Update rotation with smooth acceleration
-    if (!turbo) {
-      angleAcceleration.current += (boundedAngle - angleZ.current) * 0.01;
-    }
-    angleAcceleration.current *= 0.75;
-    angleZ.current += angleAcceleration.current;
-
-    // Apply transformations with proper Euler angles
-    spaceshipRef.current.position.setY(translateY.current);
-    spaceshipRef.current.rotation.set(
-      boundedPitch,
-      -Math.PI / 2,
-      angleZ.current,
-      "YZX"
-    );
   });
+
+  useEffect(() => {
+    if (turbo > 0 && onBoostComplete) {
+      const timeoutId = setTimeout(onBoostComplete, 2000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [turbo, onBoostComplete]);
 
   return <Spaceship turbo={turbo} ref={spaceshipRef} />;
 };
 
+// Main Experience component
 const Experience = () => {
   const [turbo, setTurbo] = useState(0);
   const [mousePoint, setMousePoint] = useState(new THREE.Vector3(0, 0, 0));
   const [isMobile, setIsMobile] = useState(false);
+  const [isBoosting, setIsBoosting] = useState(false);
 
   useEffect(() => {
     setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -239,12 +275,14 @@ const Experience = () => {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.code === "KeyW") {
       setTurbo(1);
+      setIsBoosting(true);
     }
   }, []);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     if (e.code === "KeyW") {
       setTurbo(0);
+      setIsBoosting(false);
     }
   }, []);
 
@@ -259,8 +297,18 @@ const Experience = () => {
     }
   }, [handleKeyDown, handleKeyUp, isMobile]);
 
+  const handleBoostComplete = useCallback(() => {
+    // Trigger page transition when boost is complete
+    if (isBoosting) {
+      // Add your page transition logic here
+      // For example, navigate to the next page
+      // window.location.href = '/next-page'
+      console.log('Boost complete!');
+    }
+  }, [isBoosting]);
+
   return (
-    <>
+    <div className="h-screen">
       <LoadingScreen />
       
       {/* Controls Overlay */}
@@ -324,7 +372,7 @@ const Experience = () => {
             <Stars turbo={turbo} />
 
             {/* Spaceship with movement control */}
-            <SpaceshipController mousePoint={mousePoint} turbo={turbo} />
+            <SpaceshipController mousePoint={mousePoint} turbo={turbo} onBoostComplete={handleBoostComplete} />
 
             {/* Post Processing */}
             <EffectComposer multisampling={4}>
@@ -340,7 +388,7 @@ const Experience = () => {
           </DynamicEnvMap>
         </Suspense>
       </Canvas>
-    </>
+    </div>
   );
 };
 

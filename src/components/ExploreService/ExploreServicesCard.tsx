@@ -27,10 +27,15 @@ export default function ExploreServicesCard({
       } flex items-center justify-center min-w-[170px] h-[700px] transition-[flex] duration-[0.7s] ease-out-flex cursor-pointer overflow-hidden rounded-[24px] border border-white/10`}
       onClick={() => handleClick(id)}
     >
+      {/* Image with lazy loading and optimization */}
       <img
         src={imgUrl}
         alt={title}
         className="absolute w-full h-full object-cover rounded-[24px]"
+        loading="lazy"
+        width="800"
+        height="600"
+        decoding="async"
       />
       
       {/* Gradient Overlay */}
