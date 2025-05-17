@@ -11,13 +11,16 @@ interface SpaceshipProps {
 const Spaceship = forwardRef<THREE.Group, SpaceshipProps>((props, ref) => {
   const { turbo = 0, onBoostComplete } = props
   const groupRef = useRef<THREE.Group>(null)
-  const { nodes, materials } = useGLTF('/spaceship.glb')
+  const { nodes, materials } = useGLTF('/public/spaceship.glb')
   const clock = useRef(0)
 
   useEffect(() => {
     if (groupRef.current) {
       // Scale down the model
       groupRef.current.scale.set(0.5, 0.5, 0.5)
+      
+      // Position the spaceship
+      groupRef.current.position.set(0, 0, 0)
     }
   }, [])
 
@@ -74,6 +77,6 @@ const Spaceship = forwardRef<THREE.Group, SpaceshipProps>((props, ref) => {
 })
 
 // Pre-load the model
-useGLTF.preload('/spaceship.glb')
+useGLTF.preload('/public/spaceship.glb')
 
 export default Spaceship
