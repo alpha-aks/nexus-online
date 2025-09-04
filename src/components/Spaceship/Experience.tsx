@@ -1,397 +1,171 @@
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import {
-  Suspense,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-import * as THREE from "three";
-import { Stars } from "@react-three/drei";
-import LoadingScreen from "../LoadingScreen";
+import React, { useState, useEffect } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Stars, Html, useProgress } from '@react-three/drei';
+import * as THREE from 'three';
+import Spaceship from './Spaceship';
 
-// Types
-interface DynamicEnvMapProps {
-  children: React.ReactNode;
-}
+// Loading component
+const Loading = () => (
+  <div style={{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    background: '#000',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'white',
+    fontSize: '24px'
+  }}>
+    Loading...
+  </div>
+);
 
-interface CameraRigProps {
-  turbo: number;
-}
+// Error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode, onError?: (error: Error) => void }, 
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode, onError?: (error: Error) => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-interface MousePlaneProps {
-  onMove: (point: THREE.Vector3) => void;
-  turbo: number;
-}
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
 
-interface SpaceshipControllerProps {
-  mousePoint: THREE.Vector3;
-  turbo: number;
-  onBoostComplete?: () => void;
-}
-
-// Create PMREM Generator for dynamic environment mapping
-const DynamicEnvMap: React.FC<DynamicEnvMapProps> = ({ children }) => {
-  const { gl, scene } = useThree();
-  const pmrem = useMemo(() => new THREE.PMREMGenerator(gl), [gl]);
-  const previousEnvMap = useRef<THREE.WebGLRenderTarget | null>(null);
-
-  useFrame(() => {
-    try {
-      // Hide spaceship temporarily
-      scene.traverse((obj) => {
-        if (obj.name === "spaceship") obj.visible = false;
-      });
-
-      // Clear background
-      const originalBackground = scene.background;
-      scene.background = null;
-
-      // Generate environment map
-      const envMap = pmrem.fromScene(scene);
-
-      // Restore scene
-      scene.background = originalBackground;
-      scene.traverse((obj) => {
-        if (obj.name === "spaceship") {
-          obj.visible = true;
-          // Apply environment map to spaceship materials
-          if (obj instanceof THREE.Mesh) {
-            const mesh = obj as THREE.Mesh;
-            if (mesh.material instanceof THREE.MeshStandardMaterial) {
-              mesh.material.envMap = envMap.texture;
-              mesh.material.envMapIntensity = 100;
-              mesh.material.needsUpdate = true;
-            }
-          }
-        }
-      });
-
-      // Dispose of previous envMap
-      if (previousEnvMap.current) {
-        previousEnvMap.current.dispose();
-      }
-      previousEnvMap.current = envMap;
-    } catch (error) {
-      console.error('Error generating environment map:', error);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error in 3D scene:', error, errorInfo);
+    if (this.props.onError) {
+      this.props.onError(error);
     }
-  });
+  }
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (previousEnvMap.current) {
-        previousEnvMap.current.dispose();
-      }
-      pmrem.dispose();
-    };
-  }, [pmrem, previousEnvMap]);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error in 3D scene:', error, errorInfo);
+  }
 
-  return <>{children}</>;
-};
-
-// Camera Rig
-const CameraRig: React.FC<CameraRigProps> = ({ turbo }) => {
-  const { camera } = useThree();
-  const perspCamera = camera as THREE.PerspectiveCamera;
-
-  // Base camera position for non-turbo view
-  const basePosition = new THREE.Vector3(-4, 4, 6);
-  const baseLookAt = new THREE.Vector3(0, 0, 0);
-
-  // Turbo camera position
-  const turboPosition = new THREE.Vector3(5, 1, 1);
-  const turboLookAt = new THREE.Vector3(-5, 0, 0);
-
-  useFrame(() => {
-    try {
-      const targetPos = turbo > 0 ? turboPosition : basePosition;
-      const targetLook = turbo > 0 ? turboLookAt : baseLookAt;
-
-      // Smoothly interpolate position
-      camera.position.lerp(targetPos, 0.05);
-
-      // Update camera look-at
-      camera.lookAt(targetLook);
-
-      // Update FOV
-      const targetFOV = 40 + turbo * 15;
-      perspCamera.fov = THREE.MathUtils.lerp(perspCamera.fov, targetFOV, 0.02);
-      perspCamera.updateProjectionMatrix();
-    } catch (error) {
-      console.error('Error updating camera:', error);
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: '#000',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'red',
+          padding: '20px',
+          textAlign: 'center'
+        }}>
+          <div>
+            <h2>Something went wrong with the 3D scene</h2>
+            <p>Please refresh the page to try again</p>
+          </div>
+        </div>
+      );
     }
-  });
 
-  // Set initial position and look-at
-  useEffect(() => {
-    try {
-      camera.position.copy(basePosition);
-      camera.lookAt(baseLookAt);
-      perspCamera.fov = 40;
-      perspCamera.updateProjectionMatrix();
-    } catch (error) {
-      console.error('Error setting initial camera:', error);
-    }
-  }, [camera]);
+    return this.props.children;
+  }
+}
 
-  return null;
-};
-
-// MousePlane component for mouse tracking
-const MousePlane: React.FC<MousePlaneProps> = ({ onMove, turbo }) => {
-  const intersectionPoint = new THREE.Vector3();
-
-  const handlePointerMove = (event: { point: THREE.Vector3 }) => {
-    if (turbo > 0) return; // Disable steering during turbo
-    intersectionPoint.set(-3, event.point.y, event.point.z);
-    onMove(intersectionPoint);
-  };
-
+// Loading overlay component
+function Loader() {
+  const { progress } = useProgress();
   return (
-    <mesh
-      renderOrder={2}
-      visible={false}
-      onPointerMove={handlePointerMove}
-      rotation={[-Math.PI * 0.1, 0, 0]}
-    >
-      <planeGeometry args={[20, 20]} />
-      <meshBasicMaterial transparent opacity={0.25} color={[1, 0, 1]} />
-    </mesh>
+    <Html center style={{ color: 'white' }}>
+      {Math.round(progress)}% loaded
+    </Html>
   );
-};
-
-// SpaceshipController component
-const SpaceshipController: React.FC<SpaceshipControllerProps> = ({
-  mousePoint,
-  turbo,
-  onBoostComplete,
-}) => {
-  const spaceshipRef = useRef<THREE.Group>(null);
-  const translateY = useRef(0);
-  const translateAcceleration = useRef(0);
-  const angleZ = useRef(0);
-  const angleAcceleration = useRef(0);
-  const pitchAngle = useRef(0);
-  const pitchAcceleration = useRef(0);
-
-  useFrame(() => {
-    if (!spaceshipRef.current) return;
-
-    try {
-      if (turbo > 0) {
-        // During turbo, gradually return to center
-        translateAcceleration.current += (0 - translateY.current) * 0.01;
-        angleAcceleration.current += (0 - angleZ.current) * 0.01;
-        pitchAcceleration.current += (0 - pitchAngle.current) * 0.01;
-      } else {
-        // Normal steering with bounds
-        const boundedY = Math.max(-3, Math.min(1, mousePoint.y)); // Limit vertical range to ±3 units
-        translateAcceleration.current += (boundedY - translateY.current) * 0.002;
-
-        // Calculate target pitch based on mouse Z position
-        const targetPitch = mousePoint.z * 0.5;
-        pitchAcceleration.current += (targetPitch - pitchAngle.current) * 0.01;
-      }
-
-      // Apply acceleration damping
-      translateAcceleration.current *= 0.95;
-      translateY.current += translateAcceleration.current;
-
-      pitchAcceleration.current *= 0.85;
-      pitchAngle.current += pitchAcceleration.current;
-
-      // Calculate rotation based on mouse position with bounds
-      const dir = mousePoint
-        .clone()
-        .sub(new THREE.Vector3(0, translateY.current, 0))
-        .normalize();
-
-      // Calculate yaw (left/right tilt)
-      const dirCos = dir.dot(new THREE.Vector3(0, 1, 0));
-      const angle = Math.acos(dirCos) - Math.PI / 2;
-
-      // Limit rotation angles
-      const boundedAngle = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, angle));
-      const boundedPitch = Math.max(
-        -Math.PI / 6,
-        Math.min(Math.PI / 6, pitchAngle.current)
-      );
-
-      // Update rotation with smooth acceleration
-      if (!turbo) {
-        angleAcceleration.current += (boundedAngle - angleZ.current) * 0.01;
-      }
-      angleAcceleration.current *= 0.75;
-      angleZ.current += angleAcceleration.current;
-
-      // Apply transformations with proper Euler angles
-      spaceshipRef.current.position.setY(translateY.current);
-      spaceshipRef.current.rotation.set(
-        boundedPitch,
-        -Math.PI / 2,
-        angleZ.current,
-        "YZX"
-      );
-    } catch (error) {
-      console.error('Error controlling spaceship:', error);
-    }
-  });
-
-  useEffect(() => {
-    if (turbo > 0 && onBoostComplete) {
-      const timeoutId = setTimeout(onBoostComplete, 2000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [turbo, onBoostComplete]);
-
-  return <mesh ref={spaceshipRef} />;
-};
+}
 
 // Main Experience component
 const Experience = () => {
-  const [turbo, setTurbo] = useState(0);
-  const [mousePoint, setMousePoint] = useState(new THREE.Vector3(0, 0, 0));
-  const [isMobile, setIsMobile] = useState(false);
-  const [isBoosting, setIsBoosting] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    // Log Three.js version for debugging
+    console.log('Three.js version:', THREE.REVISION);
   }, []);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.code === "KeyW") {
-      setTurbo(1);
-      setIsBoosting(true);
-    }
-  }, []);
-
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    if (e.code === "KeyW") {
-      setTurbo(0);
-      setIsBoosting(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isMobile) {
-      window.addEventListener("keydown", handleKeyDown);
-      window.addEventListener("keyup", handleKeyUp);
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-        window.removeEventListener("keyup", handleKeyUp);
-      };
-    }
-  }, [handleKeyDown, handleKeyUp, isMobile]);
-
-  const handleBoostComplete = useCallback(() => {
-    if (isBoosting) {
-      console.log('Boost complete!');
-    }
-  }, [isBoosting]);
+  if (error) {
+    return (
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'red',
+        background: 'black',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <div>
+          <h2>Error loading 3D content</h2>
+          <p>{error.message}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#333',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen">
-      <LoadingScreen />
-      
-      {/* Controls Overlay */}
-      <div className="absolute inset-x-0 bottom-12 flex justify-center pointer-events-none z-10">
-        {isMobile ? (
-          <div className="pointer-events-auto">
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={turbo === 1}
-                onChange={(e) => setTurbo(e.target.checked ? 1 : 0)}
-              />
-              <div className="w-20 h-11 bg-white/10 backdrop-blur-sm peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-white/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-10 after:w-10 after:transition-all peer-checked:bg-white/30"></div>
-              <span className="ml-3 text-sm text-white/70">
-                {turbo === 1 ? 'Boosting' : 'Boost'}
-              </span>
-            </label>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-2 text-white/50 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-            <kbd className="px-2 py-1 text-sm bg-white/10 rounded">W</kbd>
-            <span className="text-sm md:text-base">To Boost Your buisness</span>
-          </div>
-        )}
-      </div>
-
-      <Canvas
-        dpr={[1, 1.5]}
-        performance={{ min: 0.5 }}
-        shadows
-        camera={{ position: [-4, 4, 6], fov: 40 }}
-        gl={{
-          antialias: true,
-          powerPreference: "high-performance",
-          preserveDrawingBuffer: true
-        }}
-        style={{
-          background: "#000000",
-          backgroundColor: '#000000',
-        }}
-      >
-        <Suspense fallback={null}>
-          <DynamicEnvMap>
-            {/* Mouse tracking plane */}
-            <MousePlane onMove={setMousePoint} turbo={turbo} />
-
-            {/* Enhanced Lighting Setup */}
+    <div style={{ width: '100%', height: '100%', background: 'black' }}>
+      <ErrorBoundary onError={setError}>
+        <Canvas
+          camera={{ position: [0, 0, 5], fov: 75, near: 0.1, far: 1000 }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance',
+            stencil: false,
+            depth: true
+          }}
+          onCreated={({ gl }) => {
+            console.log('WebGL context created');
+            gl.setClearColor('#000000');
+          }}
+        >
+          <Suspense fallback={<Loader />}>
             <ambientLight intensity={0.5} />
-
-            {/* Main directional light */}
-            <directionalLight
-              position={[1, 2, 3]}
-              intensity={1.0}
-              color={0xffffff}
-              castShadow
-              shadow-mapSize={[2048, 2048]}
-              shadow-bias={-0.0001}
+            <pointLight position={[10, 10, 10]} intensity={1} />
+            <Spaceship />
+            <Stars 
+              radius={100}
+              depth={50}
+              count={1000}
+              factor={4}
+              saturation={0}
+              fade
+              speed={1}
             />
-
-            {/* Additional lights */}
-            <pointLight
-              position={[0, 10, 0]}
-              intensity={1.5}
-              color={0xffffff}
-            />
-            <hemisphereLight
-              intensity={0.5}
-              color="#000000"
-              groundColor="#000000"
-            />
-
-            {/* Stars Background */}
-            <Stars count={2000} radius={100} factor={4} saturation={0} fade speed={2} />
-
-            {/* Spaceship with movement control */}
-            <SpaceshipController
-              mousePoint={mousePoint}
-              turbo={turbo}
-              onBoostComplete={handleBoostComplete}
-            />
-
-            {/* Post Processing */}
-            <EffectComposer multisampling={4}>
-              <ChromaticAberration
-                blendFunction="normal"
-                offset={[0.002 * turbo, 0.002 * turbo]}
-              />
-            </EffectComposer>
-
-            {/* Camera Rig */}
-            <CameraRig turbo={turbo} />
-          </DynamicEnvMap>
-        </Suspense>
-      </Canvas>
+          </Suspense>
+        </Canvas>
+      </ErrorBoundary>
     </div>
   );
 };
-
-import { EffectComposer, ChromaticAberration } from "@react-three/postprocessing";
 
 export default Experience;

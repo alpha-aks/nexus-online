@@ -1,5 +1,3 @@
-import Experience from "@/components/Spaceship/Experience";
-import LoadingScreen from "@/components/LoadingScreen";
 import Explore from "@/components/ExploreService/ExploreComponent";
 import { About } from "@/components/About_Section/About";
 import { Theme } from "@/components/Our_Theme/Theme";
@@ -11,16 +9,23 @@ import { Footer } from "@/components/Footer/Footer";
 function Home() {
   return (
     <>
-      {/* Controls Indicator */}
-      {/* <div className="fixed bottom-4 left-4 z-10 rounded bg-black/50 p-4 text-white">
-        <p className="text-sm">Controls:</p>
-        <p className="text-xs text-gray-300">MouseClick - Turbo boost</p>
-        <p className="text-xs text-gray-300">
-          Mouse - Steer ship (disabled during turbo)
-        </p>
-      </div> */}
-      <LoadingScreen />
-      <div className="h-screen"><Experience/></div>
+      <div className="relative h-screen w-full overflow-hidden">
+        <video 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover"
+        >
+          <source src="/space-background.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <h1 className="text-white text-5xl font-bold text-center">
+            Welcome to Nexus
+          </h1>
+        </div>
+      </div>
       <About/>
       <Theme/>
       <Explore />

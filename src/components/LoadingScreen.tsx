@@ -1,22 +1,32 @@
-import { useProgress } from '@react-three/drei'
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useProgress } from '@react-three/drei';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 const LoadingScreen = () => {
-  const { progress, loaded, total } = useProgress()
-  const [show, setShow] = useState(true)
+  const { progress } = useProgress();
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
-    if (progress === 100) {
-      // Add a small delay before hiding to ensure everything is rendered
-      const timeout = setTimeout(() => {
-        setShow(false)
-      }, 500)
-      return () => clearTimeout(timeout)
-    }
-  }, [progress])
+    // Hide loading screen when progress is complete or after 3 seconds
+    const timer = setTimeout(() => {
+      setShow(false);
+    }, 3000);
 
-  if (!show) return null
+    if (progress === 100) {
+      const timeout = setTimeout(() => {
+        setShow(false);
+      }, 500);
+      
+      return () => {
+        clearTimeout(timeout);
+        clearTimeout(timer);
+      };
+    }
+
+    return () => clearTimeout(timer);
+  }, [progress]);
+
+  if (!show) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
@@ -63,8 +73,8 @@ const LoadingScreen = () => {
           </div>
 
           {/* Loading stats */}
-          <div className="mt-4 text-center text-xs text-white/30">
-            {loaded} / {total} assets loaded
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-white/50 text-sm">
+            {progress < 100 ? `Loading... ${Math.round(progress)}%` : 'Ready'}
           </div>
         </motion.div>
       </div>
@@ -72,4 +82,4 @@ const LoadingScreen = () => {
   )
 }
 
-export default LoadingScreen 
+export default LoadingScreen
