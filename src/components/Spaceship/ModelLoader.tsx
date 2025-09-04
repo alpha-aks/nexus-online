@@ -1,6 +1,5 @@
 import { useGLTF } from '@react-three/drei';
 import { useEffect, useState } from 'react';
-import * as THREE from 'three';
 
 const ModelLoader = () => {
   const [modelInfo, setModelInfo] = useState('Loading model...');
@@ -26,13 +25,24 @@ const ModelLoader = () => {
       // Log detailed hierarchy
       console.log('=== SCENE HIERARCHY ===');
       scene.traverse((child) => {
-        console.log(`${child.type}: ${child.name || 'unnamed'}`, {
+        const childInfo: any = {
           visible: child.visible,
           position: { ...child.position },
           rotation: { ...child.rotation },
           scale: { ...child.scale },
-          material: child.material ? Object.keys(child.material).filter(k => !k.startsWith('_')) : 'none'
-        });
+        };
+        
+        // Only access material if it exists and the child is a Mesh
+        if ('material' in child) {
+          const meshChild = child as THREE.Mesh;
+          childInfo.material = meshChild.material ? 
+            Object.keys(meshChild.material).filter(k => !k.startsWith('_')) : 
+            'none';
+        } else {
+          childInfo.material = 'none';
+        }
+        
+        console.log(`${child.type}: ${child.name || 'unnamed'}`, childInfo);
       });
       
       setModelInfo(JSON.stringify(info, null, 2));
@@ -55,8 +65,8 @@ const ModelLoader = () => {
       </>
     );
     
-  } catch (error) {
-    const errorMsg = `Error loading model: ${error.message}`;
+  } catch (error: unknown) {
+    const errorMsg = `Error loading model: ${error instanceof Error ? error.message : 'Unknown error'}`;
     console.error(errorMsg, error);
     setModelInfo(errorMsg);
     

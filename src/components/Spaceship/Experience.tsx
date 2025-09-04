@@ -1,27 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stars, Html, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
 import Spaceship from './Spaceship';
-
-// Loading component
-const Loading = () => (
-  <div style={{
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    background: '#000',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'white',
-    fontSize: '24px'
-  }}>
-    Loading...
-  </div>
-);
 
 // Error boundary component
 class ErrorBoundary extends React.Component<
@@ -42,10 +23,6 @@ class ErrorBoundary extends React.Component<
     if (this.props.onError) {
       this.props.onError(error);
     }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Error in 3D scene:', error, errorInfo);
   }
 
   render() {
