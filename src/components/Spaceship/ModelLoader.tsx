@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 import { useEffect } from 'react';
-import * as THREE from 'three';
+import { Mesh, Object3D } from 'three';
 
 const ModelLoader = () => {
   
@@ -34,7 +34,7 @@ const ModelLoader = () => {
         
         // Only access material if it exists and the child is a Mesh
         if ('material' in child) {
-          const meshChild = child as THREE.Mesh;
+          const meshChild = child as Mesh;
           childInfo.material = meshChild.material ? 
             Object.keys(meshChild.material).filter(k => !k.startsWith('_')) : 
             'none';
