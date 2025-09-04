@@ -1,8 +1,8 @@
 import { useGLTF } from '@react-three/drei';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import * as THREE from 'three';
 
 const ModelLoader = () => {
-  const [modelInfo, setModelInfo] = useState('Loading model...');
   
   try {
     const { scene, materials, animations } = useGLTF('/spaceship.glb');
@@ -45,7 +45,7 @@ const ModelLoader = () => {
         console.log(`${child.type}: ${child.name || 'unnamed'}`, childInfo);
       });
       
-      setModelInfo(JSON.stringify(info, null, 2));
+      console.log('Model info:', info);
       
       // Basic setup
       scene.scale.set(0.1, 0.1, 0.1);
@@ -68,7 +68,7 @@ const ModelLoader = () => {
   } catch (error: unknown) {
     const errorMsg = `Error loading model: ${error instanceof Error ? error.message : 'Unknown error'}`;
     console.error(errorMsg, error);
-    setModelInfo(errorMsg);
+    console.error(errorMsg);
     
     return (
       <group>
