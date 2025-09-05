@@ -19,20 +19,32 @@ export default function Contact() {
     setError(null);
 
     try {
-      const BOT_TOKEN = "7965214317:AAEJy9iYl674tcO8fupMzFPXn8FmRUGBG5c";
-      const CHAT_ID = "-4975658405";
+      const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID;
       
-      const message = `New Contact Form Submission:\n\nName: ${formData.name}\nEmail: ${formData.email}\nMessage:\n${formData.message}`;
+      if (!BOT_TOKEN || !CHAT_ID) {
+        throw new Error('Telegram bot configuration is missing');
+      }
+      
+      // Format the message with Markdown for better readability
+      const message = `📢 *New Contact Form Submission*\n\n` +
+        `👤 *Name:* ${formData.name || 'Not provided'}\n` +
+        `📧 *Email:* ${formData.email || 'Not provided'}\n\n` +
+        `💬 *Message:*\n${formData.message || 'No message provided'}`;
       
       const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
       const payload = {
         chat_id: CHAT_ID,
-        text: message
+        text: message,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true
       };
 
-      const response = await axios.get(url, { params: payload });
+      // Using POST with form data
+      const response = await axios.post(url, payload);
       
-      if (response.data.ok) {
+      // Check if the message was sent successfully
+      if (response.data && response.data.ok) {
         setSubmissionSuccess(true);
         setFormData({ name: "", email: "", message: "" });
       } else {
@@ -40,7 +52,24 @@ export default function Contact() {
       }
     } catch (error: any) {
       console.error('Error submitting form:', error);
-      setError(error.message || "Failed to send message");
+      
+      let errorMessage = 'Failed to send message';
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        errorMessage = `Error: ${error.response.data.description || 'Failed to send message'}`;
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+        errorMessage = 'No response from server. Please check your connection.';
+      } else {
+        // Something happened in setting up the request
+        console.error('Error:', error.message);
+        errorMessage = `Error: ${error.message}`;
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

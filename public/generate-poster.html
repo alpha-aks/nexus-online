@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Nexus Poster</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        .poster {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo {
+            width: 200px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 64px;
+            margin: 0 0 20px 0;
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+        }
+        p {
+            font-size: 28px;
+            max-width: 900px;
+            line-height: 1.4;
+            margin: 0 0 40px 0;
+            opacity: 0.9;
+        }
+        .cta {
+            background: #3a7bd5;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.1;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="poster" id="poster">
+        <div class="content">
+            <img src="/nexus-logo.png" alt="Nexus Marketing" class="logo">
+            <h1>Nexus Marketing</h1>
+            <p>Transforming Businesses with Powerful Digital Marketing Solutions</p>
+            <a href="https://www.nexusmarketing.co.in" class="cta">Visit Our Website</a>
+        </div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        particlesJS("particles", {
+            "particles": {
+                "number": {"value": 80, "density": {"enable": true, "value_area": 800}},
+                "color": {"value": "#ffffff"},
+                "shape": {"type": "circle"},
+                "opacity": {"value": 0.5, "random": true},
+                "size": {"value": 3, "random": true},
+                "line_linked": {"enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.2, "width": 1},
+                "move": {"enable": true, "speed": 2, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false}
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {"enable": true, "mode": "repulse"},
+                    "onclick": {"enable": true, "mode": "push"},
+                    "resize": true
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Function to download the poster
+        function downloadPoster() {
+            const poster = document.getElementById('poster');
+            html2canvas(poster).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'nexus-poster.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Add download button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Download Poster';
+        downloadBtn.style.marginTop = '20px';
+        downloadBtn.style.padding = '10px 20px';
+        downloadBtn.style.fontSize = '16px';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.onclick = downloadPoster;
+        document.body.appendChild(downloadBtn);
+
+        // Add html2canvas library
+        const script = document.createElement('script');
+        script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>
