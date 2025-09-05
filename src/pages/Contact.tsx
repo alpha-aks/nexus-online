@@ -1,28 +1,6 @@
 import { motion } from "framer-motion";
-import { Mail, Phone, Linkedin } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
-
-const representatives = [
-  {
-    name: "Atharva Salunkhe",
-    image: "https://images.prismic.io/alphas/aCcRXidWJ-7kSNfD_Untitleddesign-6.jpg?auto=format,compress",
-    contact: {
-      email: "atharvasalunkhe@nexusmarketing.co.in",
-      phone: "+91 82914 38590",
-      linkedin: "https://linkedin.com/in/atharva-salunkhe"
-    }
-  },
-  {
-    name: "Omkar Leve",
-    image: "https://images.prismic.io/alphas/aCcRUidWJ-7kSNe9_1st.png?auto=format,compress",
-    contact: {
-      email: "omkarleve@nexusmarketing.co.in",
-      phone: "+91 70839 03909",
-      linkedin: "https://linkedin.com/in/omkar-leve"
-    }
-  },
-];
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -185,49 +163,7 @@ export default function Contact() {
             transition={{ duration: 0.8 }}
             className="space-y-8"
           >
-            {representatives.map((rep, index) => (
-              <div key={index} className="bg-black/50 rounded-lg p-6">
-                <div className="flex items-center space-x-6">
-                  <img
-                    src={rep.image}
-                    alt={rep.name}
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="text-xl font-semibold text-white">
-                      {rep.name}
-                    </h3>
-                    <p className="text-gray-400">{rep.role}</p>
-                    <div className="mt-4 space-y-2">
-                      <div className="flex items-center text-gray-400">
-                        <Mail className="w-4 h-4 mr-2" />
-                        <a
-                          href={`mailto:${rep.contact.email}`}
-                          className="hover:text-blue-500 transition-colors"
-                        >
-                          {rep.contact.email}
-                        </a>
-                      </div>
-                      <div className="flex items-center text-gray-400">
-                        <Phone className="w-4 h-4 mr-2" />
-                        <span>{rep.contact.phone}</span>
-                      </div>
-                      <div className="flex items-center text-gray-400">
-                        <Linkedin className="w-4 h-4 mr-2" />
-                        <a
-                          href={rep.contact.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-blue-500 transition-colors"
-                        >
-                          LinkedIn
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            
           </motion.div>
         </div>
       </div>
