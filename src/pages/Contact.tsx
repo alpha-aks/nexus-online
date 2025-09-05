@@ -6,7 +6,6 @@ import axios from "axios";
 const representatives = [
   {
     name: "Atharva Salunkhe",
-    role: "CEO",
     image: "https://images.prismic.io/alphas/aCcRXidWJ-7kSNfD_Untitleddesign-6.jpg?auto=format,compress",
     contact: {
       email: "atharvasalunkhe@nexusmarketing.co.in",
@@ -16,7 +15,6 @@ const representatives = [
   },
   {
     name: "Omkar Leve",
-    role: "Founder",
     image: "https://images.prismic.io/alphas/aCcRUidWJ-7kSNe9_1st.png?auto=format,compress",
     contact: {
       email: "omkarleve@nexusmarketing.co.in",
@@ -24,16 +22,6 @@ const representatives = [
       linkedin: "https://linkedin.com/in/omkar-leve"
     }
   },
-  {
-    name: "Vishal Das",
-    role: "Marketing Director",
-    image: "https://images.prismic.io/alphas/aCiHCCdWJ-7kSQJB_WhatsAppImage2025-05-16at15.55.51.jpeg?auto=format,compress",
-    contact: {
-      email: "vishaldas@nexusmarketing.co.in",
-      phone: "+91 73041 45033",
-      linkedin: "https://linkedin.com/in/vishal-das"
-    }
-  }
 ];
 
 export default function Contact() {
