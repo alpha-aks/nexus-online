@@ -1,6 +1,6 @@
 import { useGLTF } from '@react-three/drei';
 import { useEffect } from 'react';
-import { Mesh, Object3D } from 'three';
+import { Mesh } from 'three';
 
 const ModelLoader = () => {
   
